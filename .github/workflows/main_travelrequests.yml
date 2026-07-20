@@ -1,8 +1,5 @@
-# Docs for the Azure Web Apps Deploy action:
-# https://github.com/Azure/webapps-deploy
-#
-# More GitHub Actions for Azure:
-# https://github.com/Azure/actions
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
 
 name: Build and deploy Node.js app to Azure Web App - TravelRequests
 
@@ -10,64 +7,59 @@ on:
   push:
     branches:
       - main
-
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     permissions:
-      contents: read
+      contents: read #This is required for actions/checkout
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v5
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
         with:
-          node-version: "24.x"
+          node-version: '24.x'
 
-      - name: Install dependencies, build, and test
+      - name: npm install, build, and test
         run: |
           npm install
           npm run build --if-present
           npm run test --if-present
 
-      - name: Upload application artifact
-        uses: actions/upload-artifact@v6
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
         with:
           name: node-app
           path: .
-          retention-days: 1
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-
     permissions:
-      id-token: write
-      contents: read
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
-      - name: Download application artifact
-        uses: actions/download-artifact@v8
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
         with:
           name: node-app
-          path: app
-
-      - name: Log in to Azure
-        uses: azure/login@v3
+      
+      - name: Login to Azure
+        uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_2C46282447064B3A9161D2A9BC1E613B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_770F0E190D7846EFB4B270120FF3B6E9 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_5EEA3779F95346C0BA69C2DE69839FC5 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B45F3AC010B041E0991D7B82ACC3C16A }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4EE9EB05BDE44298B737D9B488E1C263 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8794B427B6E3496CA22C1DC011ADED17 }}
 
-      - name: Deploy to Azure Web App
+      - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: "TravelRequests"
-          slot-name: "Production"
-          package: ./app
+          app-name: 'TravelRequests'
+          slot-name: 'Production'
+          package: .
+          

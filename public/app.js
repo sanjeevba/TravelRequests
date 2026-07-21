@@ -29,6 +29,16 @@ form.addEventListener('submit', async (event) => {
         endDate: formData.get('endDate'),
       }),
     });
+
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error(
+        response.status === 404
+          ? 'The requests API is unavailable. Restart or redeploy the web server.'
+          : 'The server returned an unexpected response.',
+      );
+    }
+
     const result = await response.json();
 
     if (!response.ok) {

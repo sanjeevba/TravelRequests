@@ -16,19 +16,30 @@ form.addEventListener('submit', async (event) => {
   const submitButton = form.querySelector('button[type="submit"]');
 
   submitButton.disabled = true;
-  message.textContent = 'Testing database connection...';
+  message.textContent = 'Submitting travel request...';
 
   try {
-    const response = await fetch('/api/test-database', { method: 'POST' });
+    const formData = new FormData(form);
+    const response = await fetch('/api/travel-requests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        reason: formData.get('reason'),
+        startDate: formData.get('startDate'),
+        endDate: formData.get('endDate'),
+      }),
+    });
     const result = await response.json();
 
-    if (!response.ok || !result.connected) {
-      throw new Error(result.message || 'Connection test failed.');
+    if (!response.ok) {
+      throw new Error(result.message || 'Submission failed.');
     }
 
-    message.textContent = 'Database connection successful.';
+    form.reset();
+    endDate.min = '';
+    message.textContent = result.message;
   } catch (error) {
-    message.textContent = error.message || 'Database connection failed.';
+    message.textContent = error.message || 'Travel request submission failed.';
   } finally {
     submitButton.disabled = false;
   }

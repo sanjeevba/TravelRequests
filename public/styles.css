@@ -177,6 +177,8 @@ button:hover {
 
 table {
   width: 100%;
+  min-width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   background: #fff;
 }
@@ -189,7 +191,45 @@ td {
 }
 
 th {
+  position: relative;
   background: #eef6fc;
+}
+
+.column-resizer {
+  position: absolute;
+  top: 0;
+  right: -4px;
+  z-index: 1;
+  width: 8px;
+  height: 100%;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.column-resizer::after {
+  position: absolute;
+  top: 20%;
+  bottom: 20%;
+  left: 3px;
+  width: 2px;
+  background: transparent;
+  content: "";
+}
+
+.column-resizer:hover::after,
+.column-resizer:focus-visible::after,
+.resizing-column .column-resizer::after {
+  background: #106ebe;
+}
+
+.column-resizer:focus-visible {
+  outline: 2px solid #106ebe;
+  outline-offset: -2px;
+}
+
+.resizing-column {
+  cursor: col-resize;
+  user-select: none;
 }
 
 tbody tr:last-child td {

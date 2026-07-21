@@ -1,11 +1,70 @@
 const tableContainer = document.querySelector('.table-container');
+const table = document.querySelector('#requests-table');
 const tableBody = document.querySelector('#requests-table tbody');
 const message = document.querySelector('#requests-message');
 const sortButtons = document.querySelectorAll('.sort-button');
+const columns = table.querySelectorAll('col');
 
 let requests = [];
 let sortKey = 'startDate';
 let sortDirection = 'desc';
+
+function resizeColumn(columnIndex, width) {
+  const minimumWidth = 100;
+  const currentWidths = Array.from(columns, (column) => column.getBoundingClientRect().width);
+  currentWidths[columnIndex] = Math.max(minimumWidth, width);
+
+  currentWidths.forEach((columnWidth, index) => {
+    columns[index].style.width = `${columnWidth}px`;
+  });
+
+  table.style.width = `${Math.max(tableContainer.clientWidth, currentWidths.reduce((sum, value) => sum + value, 0))}px`;
+}
+
+table.querySelectorAll('th').forEach((header, columnIndex) => {
+  const handle = document.createElement('span');
+  handle.className = 'column-resizer';
+  handle.tabIndex = 0;
+  handle.setAttribute('role', 'separator');
+  handle.setAttribute('aria-orientation', 'vertical');
+  handle.setAttribute('aria-label', `Resize ${header.textContent.trim()} column`);
+
+  handle.addEventListener('pointerdown', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const startX = event.clientX;
+    const startWidth = columns[columnIndex].getBoundingClientRect().width;
+    handle.setPointerCapture(event.pointerId);
+    document.body.classList.add('resizing-column');
+
+    const onPointerMove = (moveEvent) => {
+      resizeColumn(columnIndex, startWidth + moveEvent.clientX - startX);
+    };
+
+    const onPointerUp = () => {
+      handle.removeEventListener('pointermove', onPointerMove);
+      handle.removeEventListener('pointerup', onPointerUp);
+      handle.removeEventListener('pointercancel', onPointerUp);
+      document.body.classList.remove('resizing-column');
+    };
+
+    handle.addEventListener('pointermove', onPointerMove);
+    handle.addEventListener('pointerup', onPointerUp);
+    handle.addEventListener('pointercancel', onPointerUp);
+  });
+
+  handle.addEventListener('keydown', (event) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+
+    event.preventDefault();
+    const direction = event.key === 'ArrowLeft' ? -1 : 1;
+    const step = event.shiftKey ? 25 : 10;
+    resizeColumn(columnIndex, columns[columnIndex].getBoundingClientRect().width + direction * step);
+  });
+
+  header.appendChild(handle);
+});
 
 function formatDate(value) {
   if (!value) return '';

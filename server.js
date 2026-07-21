@@ -15,12 +15,14 @@ app.get('/api/health', (_request, response) => {
 
 app.post('/api/test-database', async (_request, response) => {
   const client = new Client({
-    host: process.env.PGHOST,
-    user: process.env.PGUSER,
-    password: process.env.PGPASSWORD,
-    database: process.env.PGDATABASE,
-    port: Number(process.env.PGPORT || 5432),
-    ssl: { rejectUnauthorized: true },
+    host: process.env.AZURE_POSTGRESQL_HOST,
+    user: process.env.AZURE_POSTGRESQL_USER,
+    password: process.env.AZURE_POSTGRESQL_PASSWORD,
+    database: process.env.AZURE_POSTGRESQL_DATABASE,
+    port: Number(process.env.AZURE_POSTGRESQL_PORT || 5432),
+    ssl: process.env.AZURE_POSTGRESQL_SSL === 'true'
+      ? { rejectUnauthorized: true }
+      : false,
     connectionTimeoutMillis: 10000,
   });
 

@@ -11,7 +11,25 @@ startDate.addEventListener('change', () => {
   }
 });
 
-form.addEventListener('submit', (event) => {
+form.addEventListener('submit', async (event) => {
   event.preventDefault();
-  message.textContent = 'Request captured.';
+  const submitButton = form.querySelector('button[type="submit"]');
+
+  submitButton.disabled = true;
+  message.textContent = 'Testing database connection...';
+
+  try {
+    const response = await fetch('/api/test-database', { method: 'POST' });
+    const result = await response.json();
+
+    if (!response.ok || !result.connected) {
+      throw new Error(result.message || 'Connection test failed.');
+    }
+
+    message.textContent = 'Database connection successful.';
+  } catch (error) {
+    message.textContent = error.message || 'Database connection failed.';
+  } finally {
+    submitButton.disabled = false;
+  }
 });

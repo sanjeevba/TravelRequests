@@ -11,18 +11,27 @@ let sortKey = 'startDate';
 let sortDirection = 'desc';
 
 function resizeColumn(columnIndex, width) {
-  const minimumWidth = 100;
+  const preferredMinimumWidth = 100;
   const currentWidths = Array.from(columns, (column) => column.getBoundingClientRect().width);
-  currentWidths[columnIndex] = Math.max(minimumWidth, width);
+  const nextColumnIndex = columnIndex + 1;
+  const combinedWidth = currentWidths[columnIndex] + currentWidths[nextColumnIndex];
+  const minimumWidth = Math.min(preferredMinimumWidth, combinedWidth / 2);
+  const resizedWidth = Math.min(
+    Math.max(minimumWidth, width),
+    combinedWidth - minimumWidth,
+  );
+
+  currentWidths[columnIndex] = resizedWidth;
+  currentWidths[nextColumnIndex] = combinedWidth - resizedWidth;
 
   currentWidths.forEach((columnWidth, index) => {
     columns[index].style.width = `${columnWidth}px`;
   });
-
-  table.style.width = `${Math.max(tableContainer.clientWidth, currentWidths.reduce((sum, value) => sum + value, 0))}px`;
 }
 
 table.querySelectorAll('th').forEach((header, columnIndex) => {
+  if (columnIndex === columns.length - 1) return;
+
   const handle = document.createElement('span');
   handle.className = 'column-resizer';
   handle.tabIndex = 0;

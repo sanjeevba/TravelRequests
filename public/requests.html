@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>My Requests | Travel Requests</title>
-    <link rel="stylesheet" href="/styles.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Travel Requests | Travel Requests</title>
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <header class="app-header">
       <div class="brand-icon" aria-hidden="true">✈</div>
-      <h1>My Requests</h1>
+      <h1>Travel Requests</h1>
     </header>
 
     <main class="request-card">
@@ -18,24 +18,52 @@
         <a class="button-link" href="/">New Request</a>
       </div>
 
-      <p id="requests-message" class="table-message" role="status" aria-live="polite">
+      <div class="table-search">
+        <input
+          id="requests-search"
+          type="search"
+          placeholder="🔍Search requests"
+          autocomplete="off"
+        />
+      </div>
+
+      <p
+        id="requests-message"
+        class="table-message"
+        role="status"
+        aria-live="polite"
+      >
         Loading requests...
       </p>
 
       <div class="table-container" hidden>
         <table id="requests-table">
           <colgroup>
-            <col style="width: 46%">
-            <col style="width: 18%">
-            <col style="width: 18%">
-            <col style="width: 18%">
+            <col style="width: 46%" />
+            <col style="width: 18%" />
+            <col style="width: 18%" />
+            <col style="width: 18%" />
           </colgroup>
           <thead>
             <tr>
-              <th scope="col"><button class="sort-button" data-key="reason">Reason for Travel</button></th>
-              <th scope="col"><button class="sort-button" data-key="startDate">Start Date</button></th>
-              <th scope="col"><button class="sort-button" data-key="endDate">End Date</button></th>
-              <th scope="col"><button class="sort-button" data-key="status">Request Status</button></th>
+              <th scope="col">
+                <button class="sort-button" data-key="reason">
+                  Reason for Travel
+                </button>
+              </th>
+              <th scope="col">
+                <button class="sort-button" data-key="startDate">
+                  Start Date
+                </button>
+              </th>
+              <th scope="col">
+                <button class="sort-button" data-key="endDate">End Date</button>
+              </th>
+              <th scope="col">
+                <button class="sort-button" data-key="status">
+                  Request Status
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody></tbody>

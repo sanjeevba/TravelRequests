@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Travel Requests</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <header class="app-header">
       <div class="brand-icon" aria-hidden="true">✈</div>
-      <h1>Travel Request</h1>
+      <h1>Travel Requests</h1>
     </header>
 
     <main class="request-card">
@@ -23,19 +23,24 @@
 
         <div class="field field-date">
           <label for="start-date">Start Date</label>
-          <input id="start-date" name="startDate" type="date" required>
+          <input id="start-date" name="startDate" type="date" required />
         </div>
 
         <div class="field field-date">
           <label for="end-date">End Date</label>
-          <input id="end-date" name="endDate" type="date" required>
+          <input id="end-date" name="endDate" type="date" required />
         </div>
 
         <div class="form-actions">
-          <button type="submit">Submit request</button>
+          <button type="submit">Submit</button>
           <a class="button-link" href="/requests.html">My Requests</a>
         </div>
-        <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+        <p
+          id="form-message"
+          class="form-message"
+          role="status"
+          aria-live="polite"
+        ></p>
       </form>
     </main>
 

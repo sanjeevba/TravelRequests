@@ -163,10 +163,33 @@ button:hover {
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
+  margin-bottom: 16px;
+}
+
+.page-heading h2 {
+  margin-bottom: 0;
 }
 
 .page-heading .button-link {
   margin-top: 0;
+}
+
+.table-search {
+  max-width: 420px;
+  margin-bottom: 16px;
+}
+
+.table-search label {
+  display: block;
+  margin-bottom: 6px;
+  color: #111;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.table-search input {
+  height: 36px;
+  padding: 7px 10px;
 }
 
 .table-container {

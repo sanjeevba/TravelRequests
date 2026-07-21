@@ -2,6 +2,7 @@ const tableContainer = document.querySelector('.table-container');
 const table = document.querySelector('#requests-table');
 const tableBody = document.querySelector('#requests-table tbody');
 const message = document.querySelector('#requests-message');
+const searchInput = document.querySelector('#requests-search');
 const sortButtons = document.querySelectorAll('.sort-button');
 const columns = table.querySelectorAll('col');
 
@@ -75,7 +76,19 @@ function formatDate(value) {
 }
 
 function renderRequests() {
-  const sortedRequests = [...requests].sort((first, second) => {
+  const searchTerm = searchInput.value.trim().toLocaleLowerCase();
+  const filteredRequests = requests.filter((request) => {
+    const values = [
+      request.reason,
+      formatDate(request.startDate),
+      formatDate(request.endDate),
+      request.status,
+    ];
+
+    return values.some((value) => String(value ?? '').toLocaleLowerCase().includes(searchTerm));
+  });
+
+  const sortedRequests = filteredRequests.sort((first, second) => {
     const firstValue = first[sortKey] ?? '';
     const secondValue = second[sortKey] ?? '';
     const comparison = String(firstValue).localeCompare(String(secondValue), undefined, {
@@ -112,6 +125,13 @@ function renderRequests() {
       isActive ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none',
     );
   });
+
+  if (requests.length === 0) {
+    message.textContent = 'No travel requests have been submitted.';
+  } else {
+    message.textContent =
+      filteredRequests.length === 0 ? 'No requests match your search.' : '';
+  }
 }
 
 sortButtons.forEach((button) => {
@@ -128,6 +148,8 @@ sortButtons.forEach((button) => {
     renderRequests();
   });
 });
+
+searchInput.addEventListener('input', renderRequests);
 
 async function loadRequests() {
   try {

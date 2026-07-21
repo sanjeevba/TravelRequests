@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Requests | Travel Requests</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand-icon" aria-hidden="true">✈</div>
+      <h1>My Requests</h1>
+    </header>
+
+    <main class="request-card">
+      <div class="page-heading">
+        <h2>My Requests</h2>
+        <a class="button-link" href="/">New Request</a>
+      </div>
+
+      <p id="requests-message" class="table-message" role="status" aria-live="polite">
+        Loading requests...
+      </p>
+
+      <div class="table-container" hidden>
+        <table id="requests-table">
+          <thead>
+            <tr>
+              <th scope="col"><button class="sort-button" data-key="reason">Reason for Travel</button></th>
+              <th scope="col"><button class="sort-button" data-key="startDate">Start Date</button></th>
+              <th scope="col"><button class="sort-button" data-key="endDate">End Date</button></th>
+              <th scope="col"><button class="sort-button" data-key="status">Request Status</button></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </main>
+
+    <script src="/requests.js"></script>
+  </body>
+</html>

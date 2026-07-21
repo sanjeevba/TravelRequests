@@ -7,11 +7,50 @@ const { Client } = require('pg');
 const app = express();
 const port = process.env.PORT || 3000;
 
+function createDatabaseClient() {
+  return new Client({
+    host: process.env.AZURE_POSTGRESQL_HOST,
+    user: process.env.AZURE_POSTGRESQL_USER,
+    password: process.env.AZURE_POSTGRESQL_PASSWORD,
+    database: process.env.AZURE_POSTGRESQL_DATABASE,
+    port: Number(process.env.AZURE_POSTGRESQL_PORT || 5432),
+    ssl: process.env.AZURE_POSTGRESQL_SSL === 'true'
+      ? { rejectUnauthorized: true }
+      : false,
+    connectionTimeoutMillis: 10000,
+  });
+}
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/health', (_request, response) => {
   response.json({ status: 'ok' });
+});
+
+app.get('/api/travel-requests', async (_request, response) => {
+  const client = createDatabaseClient();
+
+  try {
+    await client.connect();
+    const result = await client.query(
+      `SELECT
+        "Reason for Travel" AS reason,
+        "Start Date" AS "startDate",
+        "End Date" AS "endDate",
+        "Request Status" AS status
+       FROM travel_request
+       ORDER BY "Start Date" DESC`,
+    );
+    response.json(result.rows);
+  } catch (error) {
+    console.error('Travel request retrieval failed:', error.message);
+    response.status(500).json({
+      message: 'Could not retrieve travel requests.',
+    });
+  } finally {
+    await client.end().catch(() => {});
+  }
 });
 
 app.post('/api/travel-requests', async (request, response) => {
@@ -29,17 +68,7 @@ app.post('/api/travel-requests', async (request, response) => {
     });
   }
 
-  const client = new Client({
-    host: process.env.AZURE_POSTGRESQL_HOST,
-    user: process.env.AZURE_POSTGRESQL_USER,
-    password: process.env.AZURE_POSTGRESQL_PASSWORD,
-    database: process.env.AZURE_POSTGRESQL_DATABASE,
-    port: Number(process.env.AZURE_POSTGRESQL_PORT || 5432),
-    ssl: process.env.AZURE_POSTGRESQL_SSL === 'true'
-      ? { rejectUnauthorized: true }
-      : false,
-    connectionTimeoutMillis: 10000,
-  });
+  const client = createDatabaseClient();
 
   try {
     await client.connect();

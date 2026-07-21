@@ -131,10 +131,107 @@ button:hover {
   background: #005a9e;
 }
 
+.form-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.button-link {
+  display: inline-block;
+  margin: 7px 10px 0;
+  padding: 9px 17px;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  background: #106ebe;
+  border-radius: 3px;
+}
+
+.button-link:hover {
+  background: #005a9e;
+}
+
 .form-message {
   display: inline-block;
   margin: 0 0 0 10px;
   color: #107c10;
+}
+
+.page-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page-heading .button-link {
+  margin-top: 0;
+}
+
+.table-container {
+  overflow-x: auto;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th,
+td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+  background: #eef6fc;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+.sort-button {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 0 20px 0 0;
+  color: #1f2937;
+  text-align: left;
+  background: transparent;
+}
+
+.sort-button:hover {
+  color: #005a9e;
+  background: transparent;
+}
+
+.sort-button::after {
+  position: absolute;
+  right: 0;
+  color: #64748b;
+  content: "↕";
+}
+
+.sort-button.active-sort[aria-sort="ascending"]::after {
+  content: "↑";
+}
+
+.sort-button.active-sort[aria-sort="descending"]::after {
+  content: "↓";
+}
+
+.table-message {
+  color: #4b5563;
 }
 
 @media (max-width: 560px) {

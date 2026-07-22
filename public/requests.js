@@ -84,6 +84,33 @@ function formatDate(value) {
   return `${month}/${day}/${year}`;
 }
 
+async function deleteRequest(request, button) {
+  if (!window.confirm(`Delete the travel request for "${request.reason}"?`)) return;
+
+  button.disabled = true;
+  button.setAttribute('aria-label', `Deleting travel request for ${request.reason}`);
+  message.textContent = 'Deleting travel request…';
+
+  try {
+    const response = await fetch(`/api/travel-requests/${encodeURIComponent(request.id)}`, {
+      method: 'DELETE',
+    });
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Could not delete the travel request.');
+    }
+
+    requests = requests.filter((item) => item.id !== request.id);
+    tableContainer.hidden = requests.length === 0;
+    renderRequests();
+  } catch (error) {
+    message.textContent = error.message || 'Could not delete the travel request.';
+    button.disabled = false;
+    button.setAttribute('aria-label', `Delete travel request for ${request.reason}`);
+  }
+}
+
 function renderRequests() {
   const searchTerm = searchInput.value.trim().toLocaleLowerCase();
   const filteredRequests = requests.filter((request) => {
@@ -122,6 +149,24 @@ function renderRequests() {
       cell.textContent = value ?? '';
       row.appendChild(cell);
     });
+
+    const actionsCell = document.createElement('td');
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'delete-button';
+    deleteButton.type = 'button';
+    deleteButton.title = 'Delete';
+    deleteButton.innerHTML = `
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M4 7h16" />
+        <path d="M9 7V4h6v3" />
+        <path d="m6.5 7 1 13h9l1-13" />
+        <path d="M10 11v5M14 11v5" />
+      </svg>
+    `;
+    deleteButton.setAttribute('aria-label', `Delete travel request for ${request.reason}`);
+    deleteButton.addEventListener('click', () => deleteRequest(request, deleteButton));
+    actionsCell.appendChild(deleteButton);
+    row.appendChild(actionsCell);
 
     tableBody.appendChild(row);
   });

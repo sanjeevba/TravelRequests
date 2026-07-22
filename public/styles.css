@@ -291,6 +291,41 @@ tbody tr:hover {
   background: #f8fafc;
 }
 
+.delete-button {
+  display: inline-grid;
+  width: 26px;
+  height: 26px;
+  margin: 0;
+  padding: 0;
+  color: #b42318;
+  background: transparent;
+  border: 1px solid #d92d20;
+  border-radius: 4px;
+  place-items: center;
+}
+
+.delete-button svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.delete-button:hover {
+  color: #fff;
+  background: #b42318;
+}
+
+.delete-button:disabled {
+  color: #64748b;
+  background: #e5e7eb;
+  border-color: #cbd5e1;
+  cursor: wait;
+}
+
 .sort-button {
   position: relative;
   width: 100%;

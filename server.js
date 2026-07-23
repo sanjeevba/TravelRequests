@@ -35,7 +35,7 @@ app.get('/api/travel-requests', async (_request, response) => {
     await client.connect();
     const result = await client.query(
       `SELECT
-        ctid::text AS id,
+        travel_request_id AS id,
         "Reason for Travel" AS reason,
         "Start Date" AS "startDate",
         "End Date" AS "endDate",
@@ -73,13 +73,17 @@ app.post('/api/travel-requests', async (request, response) => {
 
   try {
     await client.connect();
-    await client.query(
+    const result = await client.query(
       `INSERT INTO travel_request
         ("Reason for Travel", "Start Date", "End Date", "Request Status")
-       VALUES ($1, $2, $3, $4)`,
+       VALUES ($1, $2, $3, $4)
+       RETURNING travel_request_id AS id`,
       [reason.trim(), startDate, endDate, 'Pending'],
     );
-    response.status(201).json({ message: 'Travel request submitted.' });
+    response.status(201).json({
+      id: result.rows[0].id,
+      message: 'Travel request submitted.',
+    });
   } catch (error) {
     console.error('Travel request insert failed:', error.message);
     response.status(500).json({
@@ -93,7 +97,7 @@ app.post('/api/travel-requests', async (request, response) => {
 app.delete('/api/travel-requests/:id', async (request, response) => {
   const { id } = request.params;
 
-  if (!/^\(\d+,\d+\)$/.test(id)) {
+  if (!/^[1-9]\d*$/.test(id)) {
     return response.status(400).json({ message: 'Invalid travel request identifier.' });
   }
 
@@ -102,7 +106,7 @@ app.delete('/api/travel-requests/:id', async (request, response) => {
   try {
     await client.connect();
     const result = await client.query(
-      'DELETE FROM travel_request WHERE ctid = $1::tid RETURNING 1',
+      'DELETE FROM travel_request WHERE travel_request_id = $1 RETURNING travel_request_id',
       [id],
     );
 

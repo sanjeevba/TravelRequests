@@ -6,6 +6,7 @@ const { Client } = require('pg');
 
 const app = express();
 const port = process.env.PORT || 3000;
+const clientDirectory = path.join(__dirname, 'dist');
 
 function createDatabaseClient() {
   return new Client({
@@ -22,7 +23,7 @@ function createDatabaseClient() {
 }
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(clientDirectory));
 
 app.get('/api/health', (_request, response) => {
   response.json({ status: 'ok' });
@@ -121,6 +122,12 @@ app.delete('/api/travel-requests/:id', async (request, response) => {
   } finally {
     await client.end().catch(() => {});
   }
+});
+
+// Let React handle every browser route while keeping /api routes in Express.
+app.use((request, response, next) => {
+  if (request.method !== 'GET' || !request.accepts('html')) return next();
+  return response.sendFile(path.join(clientDirectory, 'index.html'));
 });
 
 app.listen(port, () => {

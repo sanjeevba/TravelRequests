@@ -66,7 +66,7 @@ function NewRequest() {
 
   return (
     <main className="request-card">
-      <h2>New request - commit 2</h2>
+      <h2>New request - commit 1</h2>
       <form onSubmit={submitRequest}>
         <div className="field field-wide">
           <label htmlFor="reason">Reason for travel</label>

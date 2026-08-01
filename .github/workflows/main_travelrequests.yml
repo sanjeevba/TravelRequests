@@ -52,8 +52,4 @@ jobs:
           app-name: 'TravelRequests'
           slot-name: 'Production'
           package: .
-<<<<<<< HEAD
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EB2F9973DFF44A45B01CB7D6D8DF437B }}
-=======
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_77DE136888C3452FAEA3FAE17C13A505 }}
->>>>>>> 47c4ef8397b6178ba90343f60938e5a5a48f5f71
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_DD2DEC21B5E84CB090231D4DF4BA252B }}

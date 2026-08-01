@@ -152,9 +152,17 @@ sortButtons.forEach((button) => {
 searchInput.addEventListener('input', renderRequests);
 
 async function loadRequests() {
+  console.log('[Travel Requests] Requesting GET /api/travel-requests...');
+
   try {
     const response = await fetch('/api/travel-requests');
     const contentType = response.headers.get('content-type') || '';
+
+    console.log('[Travel Requests] API response received:', {
+      status: response.status,
+      statusText: response.statusText,
+      contentType,
+    });
 
     if (!contentType.includes('application/json')) {
       throw new Error(
@@ -166,8 +174,17 @@ async function loadRequests() {
 
     const result = await response.json();
 
+    console.log('[Travel Requests] API response body:', result);
+
     if (!response.ok) {
-      throw new Error(result.message || 'Could not load requests.');
+      const diagnosticDetails = [result.errorCode, result.diagnosticId]
+        .filter(Boolean)
+        .join(' / ');
+      throw new Error(
+        `${result.message || 'Could not load requests.'}${
+          diagnosticDetails ? ` (${diagnosticDetails})` : ''
+        }`,
+      );
     }
 
     requests = result;
@@ -175,6 +192,7 @@ async function loadRequests() {
     tableContainer.hidden = requests.length === 0;
     renderRequests();
   } catch (error) {
+    console.error('[Travel Requests] Could not load requests:', error);
     message.textContent = error.message || 'Could not load requests.';
   }
 }

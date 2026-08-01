@@ -29,10 +29,26 @@ app.get('/api/health', (_request, response) => {
 });
 
 app.get('/api/travel-requests', async (_request, response) => {
+  const diagnosticId = `travel-requests-${Date.now()}`;
+  const startedAt = Date.now();
   const client = createDatabaseClient();
 
+  console.log(`[${diagnosticId}] GET /api/travel-requests started.`);
+  console.log(`[${diagnosticId}] Database configuration:`, {
+    hostConfigured: Boolean(process.env.AZURE_POSTGRESQL_HOST),
+    userConfigured: Boolean(process.env.AZURE_POSTGRESQL_USER),
+    passwordConfigured: Boolean(process.env.AZURE_POSTGRESQL_PASSWORD),
+    databaseConfigured: Boolean(process.env.AZURE_POSTGRESQL_DATABASE),
+    port: Number(process.env.AZURE_POSTGRESQL_PORT || 5432),
+    sslEnabled: process.env.AZURE_POSTGRESQL_SSL === 'true',
+  });
+
   try {
+    console.log(`[${diagnosticId}] Connecting to PostgreSQL...`);
     await client.connect();
+    console.log(`[${diagnosticId}] PostgreSQL connection established.`);
+
+    console.log(`[${diagnosticId}] Running travel request query...`);
     const result = await client.query(
       `SELECT
         "Reason for Travel" AS reason,
@@ -42,14 +58,27 @@ app.get('/api/travel-requests', async (_request, response) => {
        FROM travel_request
        ORDER BY "Start Date" DESC`,
     );
+    console.log(
+      `[${diagnosticId}] Query completed with ${result.rowCount} row(s) in ${Date.now() - startedAt} ms.`,
+    );
     response.json(result.rows);
   } catch (error) {
-    console.error('Travel request retrieval failed:', error.message);
+    console.error(`[${diagnosticId}] Travel request retrieval failed after ${Date.now() - startedAt} ms.`, {
+      name: error.name,
+      code: error.code,
+      message: error.message,
+      stack: error.stack,
+    });
     response.status(500).json({
       message: 'Could not retrieve travel requests.',
+      diagnosticId,
+      errorCode: error.code || 'UNKNOWN_DATABASE_ERROR',
     });
   } finally {
-    await client.end().catch(() => {});
+    console.log(`[${diagnosticId}] Closing PostgreSQL connection.`);
+    await client.end().catch((error) => {
+      console.error(`[${diagnosticId}] Error while closing PostgreSQL connection:`, error.message);
+    });
   }
 });
 

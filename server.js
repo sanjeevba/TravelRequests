@@ -51,6 +51,7 @@ app.get('/api/travel-requests', async (_request, response) => {
     console.log(`[${diagnosticId}] Running travel request query...`);
     const result = await client.query(
       `SELECT
+        travel_request_id AS id,
         "Reason for Travel" AS reason,
         "Start Date" AS "startDate",
         "End Date" AS "endDate",
@@ -113,6 +114,37 @@ app.post('/api/travel-requests', async (request, response) => {
     response.status(500).json({
       message: 'Could not submit the travel request.',
     });
+  } finally {
+    await client.end().catch(() => {});
+  }
+});
+
+app.delete('/api/travel-requests/:id', async (request, response) => {
+  const { id } = request.params;
+
+  if (!/^[1-9]\d*$/.test(id)) {
+    return response.status(400).json({
+      message: 'Invalid travel request identifier.',
+    });
+  }
+
+  const client = createDatabaseClient();
+
+  try {
+    await client.connect();
+    const result = await client.query(
+      'DELETE FROM travel_request WHERE travel_request_id = $1 RETURNING travel_request_id',
+      [id],
+    );
+
+    if (result.rowCount === 0) {
+      return response.status(404).json({ message: 'Travel request not found.' });
+    }
+
+    response.json({ message: 'Travel request deleted.' });
+  } catch (error) {
+    console.error('Travel request deletion failed:', error.message);
+    response.status(500).json({ message: 'Could not delete the travel request.' });
   } finally {
     await client.end().catch(() => {});
   }

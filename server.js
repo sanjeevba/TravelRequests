@@ -6,7 +6,6 @@ const { Client } = require('pg');
 
 const app = express();
 const port = process.env.PORT || 3000;
-const clientDirectory = path.join(__dirname, 'dist');
 
 function createDatabaseClient() {
   return new Client({
@@ -23,7 +22,7 @@ function createDatabaseClient() {
 }
 
 app.use(express.json());
-app.use(express.static(clientDirectory));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/health', (_request, response) => {
   response.json({ status: 'ok' });
@@ -36,7 +35,6 @@ app.get('/api/travel-requests', async (_request, response) => {
     await client.connect();
     const result = await client.query(
       `SELECT
-        travel_request_id AS id,
         "Reason for Travel" AS reason,
         "Start Date" AS "startDate",
         "End Date" AS "endDate",
@@ -74,17 +72,13 @@ app.post('/api/travel-requests', async (request, response) => {
 
   try {
     await client.connect();
-    const result = await client.query(
+    await client.query(
       `INSERT INTO travel_request
         ("Reason for Travel", "Start Date", "End Date", "Request Status")
-       VALUES ($1, $2, $3, $4)
-       RETURNING travel_request_id AS id`,
+       VALUES ($1, $2, $3, $4)`,
       [reason.trim(), startDate, endDate, 'Pending'],
     );
-    response.status(201).json({
-      id: result.rows[0].id,
-      message: 'Travel request submitted.',
-    });
+    response.status(201).json({ message: 'Travel request submitted.' });
   } catch (error) {
     console.error('Travel request insert failed:', error.message);
     response.status(500).json({
@@ -93,41 +87,6 @@ app.post('/api/travel-requests', async (request, response) => {
   } finally {
     await client.end().catch(() => {});
   }
-});
-
-app.delete('/api/travel-requests/:id', async (request, response) => {
-  const { id } = request.params;
-
-  if (!/^[1-9]\d*$/.test(id)) {
-    return response.status(400).json({ message: 'Invalid travel request identifier.' });
-  }
-
-  const client = createDatabaseClient();
-
-  try {
-    await client.connect();
-    const result = await client.query(
-      'DELETE FROM travel_request WHERE travel_request_id = $1 RETURNING travel_request_id',
-      [id],
-    );
-
-    if (result.rowCount === 0) {
-      return response.status(404).json({ message: 'Travel request not found.' });
-    }
-
-    response.json({ message: 'Travel request deleted.' });
-  } catch (error) {
-    console.error('Travel request deletion failed:', error.message);
-    response.status(500).json({ message: 'Could not delete the travel request.' });
-  } finally {
-    await client.end().catch(() => {});
-  }
-});
-
-// Let React handle every browser route while keeping /api routes in Express.
-app.use((request, response, next) => {
-  if (request.method !== 'GET' || !request.accepts('html')) return next();
-  return response.sendFile(path.join(clientDirectory, 'index.html'));
 });
 
 app.listen(port, () => {
